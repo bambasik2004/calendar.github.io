@@ -117,6 +117,5 @@ function selectDate(day) {
   currentCalendar.selectedDate = day + ' ' + currentCalendar.Months[currentCalendar.currMonth] + ' ' + currentCalendar.currYear;
   currentCalendar.currDay = day;
   currentCalendar.showcurr();
-
-  Telegram.WebApp.sendData(currentCalendar.selectedDate);
+  Telegram.WebApp.sendData(currentCalendar.currDay, currentCalendar.currMonth, currentCalendar.currYear);
 }
