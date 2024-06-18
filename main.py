@@ -4,21 +4,19 @@ import sys
 from os import getenv
 import json
 from dotenv import load_dotenv
-from datetime import datetime
+from datetime import datetime, timedelta
 from aiogram import Bot, Dispatcher, html
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from aiogram.filters import Command, CommandStart
 from aiogram.types import Message, WebAppInfo, KeyboardButton, ReplyKeyboardMarkup, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
-# from aiogram.utils.keyboard import InlineKeyboardBuilder
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 load_dotenv()
 TOKEN = getenv("BOT_TOKEN")
 
-# All handlers should be attached to the Dispatcher
 dp = Dispatcher()
 
-# Define the WebAppInfo with the URL
 web_app = WebAppInfo(url="https://bambasik2004.github.io/calendar.github.io/")
 
 deadlines = {}
@@ -27,8 +25,7 @@ event = ''
 
 keyboard = ReplyKeyboardMarkup(keyboard=[
     [KeyboardButton(text='Calendar', web_app=web_app)]
-]
-)
+])
 
 keyboard1 = InlineKeyboardMarkup(inline_keyboard=[
     [InlineKeyboardButton(text='Add event', callback_data='add_button')],
@@ -51,13 +48,21 @@ async def get_list(callback: CallbackQuery) -> None:
     await callback.answer()
 
 @dp.callback_query(lambda callback: callback.data == 'add_button')
-async def set_deadline(message: Message) -> None:
+async def set_deadline(callback: CallbackQuery) -> None:
     dt = datetime(year=cur_data['year'], month=cur_data['month'], day=cur_data['day'], hour=12)
     format_dt = dt.strftime(f"%A, %d %B %Y")
     if format_dt not in deadlines:
         deadlines[format_dt] = set()
     deadlines[format_dt].add(event)
-    await message.answer(f'Событие {event} добавлено: {format_dt}')
+
+    # Напоминалки
+    # тестовая scheduler.add_job(send_reminder, 'date', run_date=datetime.now() + timedelta(seconds=5), args=[callback.message.chat.id, event, 'через неделю'])
+    scheduler.add_job(send_reminder, 'date', run_date=dt - timedelta(days=7), args=[callback.message.chat.id, event, 'через неделю'])
+    scheduler.add_job(send_reminder, 'date', run_date=dt - timedelta(days=3), args=[callback.message.chat.id, event, 'через 3 дня'])
+    scheduler.add_job(send_reminder, 'date', run_date=dt - timedelta(days=1), args=[callback.message.chat.id, event, 'завтра'])
+
+    await callback.message.answer(f'Событие {event} добавлено: {format_dt}')
+    await callback.answer()
 
 @dp.message()
 async def set_deadline_data(message: Message) -> None:
@@ -69,11 +74,16 @@ async def set_deadline_data(message: Message) -> None:
         global event
         event = message.text
 
-async def main() -> None:
-    # Initialize Bot instance with default bot properties which will be passed to all API calls
+async def send_reminder(chat_id: int, event: str, reminder: str):
     bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
+    await bot.send_message(chat_id, f"Напоминание: {reminder} дедлайн для задачи '{event}'")
 
-    # And run events dispatching
+async def main() -> None:
+    global scheduler
+    scheduler = AsyncIOScheduler()
+    scheduler.start()
+    
+    bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
     await dp.start_polling(bot)
 
 if __name__ == "__main__":
