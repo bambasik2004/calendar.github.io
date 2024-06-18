@@ -1,0 +1,158 @@
+html, body {
+  font-size: 100%;
+  line-height: 1.5;
+  font-family: sans-serif;
+  background: #28283b;
+  color: #444;
+  margin: 0;
+  padding: 0;
+}
+
+*, *:before, *:after {
+  box-sizing: border-box;
+}
+
+.group:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  vertical-align: baseline;
+}
+
+a {
+  text-decoration: none;
+}
+
+.calendar-wrapper {
+  overflow-y: auto; /* add a scrollbar if the content is too long */
+  max-width: 100%;
+  width: 90%;
+  margin: 2em auto;
+  padding: 2em;
+  border: 1px solid #dcdcff;
+  border-radius: 5px;
+  background: #fff;
+  box-sizing: border-box;
+}
+
+table {
+  width: 100%;
+  border: 1px solid #dcdcff;
+  border-radius: 3px;
+  border-collapse: collapse;
+  color: #444;
+  table-layout: fixed;
+}
+
+td {
+  text-align: center;
+  vertical-align: middle;
+  border-right: 1px solid #dcdcff;
+  border-top: 1px solid #dcdcff;
+  width: 14.28571429%; /* 1/7th of 100% */
+  padding: 5px;
+  box-sizing: border-box;
+  height: 10vh;
+  font-size: clamp(12px, 2.5vw, 24px); /* изменено */
+}
+
+td.not-current {
+  color: #c0c0c0;
+}
+
+td.today {
+  font-weight: 700;
+  color: #28283b;
+  font-size: clamp(12px, 2.5vw, 24px); /* изменено */
+}
+
+td.selected {
+  background-color: #ffd700;
+  color: #28283b;
+  font-weight: bold;
+}
+
+thead td {
+  border: none;
+  color: #28283b;
+  text-transform: uppercase;
+  font-size: clamp(12px, 2.5vw, 24px); /* изменено */
+}
+
+#selectedDate {
+  font-size: clamp(12px, 2.5vw, 24px); /* изменено */
+  font-weight: bold;
+}
+
+#btnPrev,
+#btnNext {
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: clamp(12px, 2.5vw, 24px); /* изменено */
+  color: #c0c0c0;
+  cursor: pointer;
+  font-family: sans-serif;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+}
+
+#btnPrev:hover,
+#btnNext:hover {
+  color: #28283b;
+  font-weight: bold;
+}
+
+#btnPrev {
+  float: left;
+  margin-bottom: 20px;
+}
+
+#btnPrev:before {
+  content: '\f104';
+  font-family: FontAwesome;
+  padding-right: 4px;
+}
+
+#btnNext {
+  float: right;
+  margin-bottom: 20px;
+}
+
+#btnNext:after {
+  content: '\f105';
+  font-family: FontAwesome;
+  padding-left: 4px;
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+  .calendar-wrapper {
+    width: 95%;
+    margin: 1em auto;
+    padding: 1em;
+  }
+
+  td {
+    height: 40px;
+    padding: 3px;
+  }
+}
+
+@media (max-width: 480px) {
+  .calendar-wrapper {
+    width: 100%;
+    margin: 1em;
+    padding: 1em;
+  }
+
+  td {
+    height: 50px;
+    padding: 5px;
+  }
+}
